@@ -11,6 +11,7 @@
 // =-=-=-=-=-=-=-
 #include "irods_native_auth_object.hpp"
 #include "irods_pam_auth_object.hpp"
+#include "irods_pam_interactive_auth_object.hpp"
 #include "irods_gsi_object.hpp"
 #include "irods_kvp_string_parser.hpp"
 #include "irods_auth_constants.hpp"
@@ -279,6 +280,9 @@ main( int argc, char **argv ) {
     if ( irods::AUTH_PAM_SCHEME == lower_scheme ) {
         doPassword = 0;
     }
+    if ( irods::AUTH_PAM_INTERACTIVE_SCHEME == lower_scheme ) {
+        doPassword = 0;
+    }
 
     if ( strcmp( my_env.rodsUserName, ANONYMOUS_USER ) == 0 ) {
         doPassword = 0;
@@ -338,6 +342,32 @@ main( int argc, char **argv ) {
         // pass the context with the ttl as well as an override which
         // demands the pam authentication plugin
         status = clientLogin( Conn, ctx_str.c_str(), irods::AUTH_PAM_SCHEME.c_str() );
+        if ( status != 0 ) {
+            return 8;
+        }
+
+        // =-=-=-=-=-=-=-
+        // if this succeeded, do the regular login below to check
+        // that the generated password works properly.
+    } // if pam
+    if ( irods::AUTH_PAM_INTERACTIVE_SCHEME == lower_scheme ) {
+        // =-=-=-=-=-=-=-
+        // set a flag stating that we have done pam and the auth
+        // scheme needs overridden
+        pam_flg = true;
+
+        // =-=-=-=-=-=-=-
+        // build a context string which includes the ttl and password
+        std::stringstream ttl_str;  ttl_str << ttl;
+		irods::kvp_map_t ctx_map;
+		ctx_map[ irods::AUTH_TTL_KEY ] = ttl_str.str();
+		ctx_map[ irods::AUTH_PASSWORD_KEY ] = password;
+		std::string ctx_str = irods::escaped_kvp_string(
+		                          ctx_map);
+        // =-=-=-=-=-=-=-
+        // pass the context with the ttl as well as an override which
+        // demands the pam authentication plugin
+        status = clientLogin( Conn, ctx_str.c_str(), irods::AUTH_PAM_INTERACTIVE_SCHEME.c_str() );
         if ( status != 0 ) {
             return 8;
         }
