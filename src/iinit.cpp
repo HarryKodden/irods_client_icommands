@@ -359,11 +359,27 @@ main( int argc, char **argv ) {
         // =-=-=-=-=-=-=-
         // build a context string which includes the ttl and password
         std::stringstream ttl_str;  ttl_str << ttl;
-		irods::kvp_map_t ctx_map;
-		ctx_map[ irods::AUTH_TTL_KEY ] = ttl_str.str();
-		ctx_map[ irods::AUTH_PASSWORD_KEY ] = password;
-		std::string ctx_str = irods::escaped_kvp_string(
-		                          ctx_map);
+        irods::kvp_map_t ctx_map;
+        ctx_map[ irods::AUTH_TTL_KEY ] = ttl_str.str();
+        ctx_map[ irods::AUTH_PASSWORD_KEY ] = password;
+        if(myRodsArgs.verbose == True)
+        {
+          ctx_map["VERBOSE"] = "true";
+        }
+        else
+        {
+          ctx_map["VERBOSE"] = "false";
+        }
+        if(myRodsArgs.veryVerbose == True)
+        {
+          ctx_map["VVERBOSE"] = "true";
+        }
+        else
+        {
+          ctx_map["VVERBOSE"] = "false";
+        }
+
+        std::string ctx_str = irods::escaped_kvp_string(ctx_map);
         // =-=-=-=-=-=-=-
         // pass the context with the ttl as well as an override which
         // demands the pam authentication plugin
