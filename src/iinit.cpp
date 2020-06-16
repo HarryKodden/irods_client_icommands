@@ -378,6 +378,7 @@ main( int argc, char **argv ) {
         {
           ctx_map["VVERBOSE"] = "false";
         }
+        ctx_map["ECHO"] = "true";
 
         std::string ctx_str = irods::escaped_kvp_string(ctx_map);
         // =-=-=-=-=-=-=-
