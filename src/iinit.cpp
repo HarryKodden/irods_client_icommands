@@ -279,7 +279,9 @@ main( int argc, char **argv ) {
     if ( irods::AUTH_PAM_SCHEME == lower_scheme ) {
         doPassword = 0;
     }
-
+    if ( lower_scheme == "pam_interactive") {
+        doPassword = 0;
+    }
     if ( strcmp( my_env.rodsUserName, ANONYMOUS_USER ) == 0 ) {
         doPassword = 0;
     }
@@ -346,8 +348,39 @@ main( int argc, char **argv ) {
         // if this succeeded, do the regular login below to check
         // that the generated password works properly.
     } // if pam
+    if ( "pam_interactive" == lower_scheme ) {
+      irods::kvp_map_t ctx_map;
+      if(myRodsArgs.verbose == True)
+      {
+        ctx_map["VERBOSE"] = "true";
+      }
+      else
+      {
+        ctx_map["VERBOSE"] = "false";
+      }
+      if(myRodsArgs.veryVerbose == True)
+      {
+        ctx_map["VVERBOSE"] = "true";
+      }
+      else
+      {
+        ctx_map["VVERBOSE"] = "false";
+      }
+      // tell the plugin that we are using iinit
+      ctx_map["ECHO"] = "true";
 
-    if ( strcmp( my_env.rodsAuthScheme, AUTH_OPENID_SCHEME ) == 0 ) {
+      std::string ctx_str = irods::escaped_kvp_string(ctx_map);
+      // =-=-=-=-=-=-=-
+      // pass the context with the ttl as well as an override which
+      // demands the pam authentication plugin
+      status = clientLogin( Conn, ctx_str.c_str(), "pam_interactive" );
+      if ( status != 0 )
+      {
+        rcDisconnect( Conn );
+        return 7;
+      }
+    }
+    else if ( strcmp( my_env.rodsAuthScheme, AUTH_OPENID_SCHEME ) == 0 ) {
         irods::kvp_map_t ctx_map;
         try {
             std::string client_provider_cfg = irods::get_environment_property<std::string&>( "openid_provider" );
