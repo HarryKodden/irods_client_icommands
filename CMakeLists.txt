@@ -87,6 +87,8 @@ set(
   izonereport
   )
 
+set(IRODS_CXX_STANDARD 14)
+
 foreach(EXECUTABLE ${IRODS_CLIENT_ICOMMANDS_EXECUTABLES})
   add_executable(
     ${EXECUTABLE}
