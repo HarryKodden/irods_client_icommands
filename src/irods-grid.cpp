@@ -12,7 +12,7 @@
 #include "boost/algorithm/string.hpp"
 #include "boost/lexical_cast.hpp"
 
-#include "jansson.h"
+#include "json.hpp"
 
 #include "rodsClient.h"
 #include "irods_server_control_plane.hpp"

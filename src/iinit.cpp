@@ -21,7 +21,7 @@
 
 #include "boost/lexical_cast.hpp"
 
-#include "jansson.h"
+#include "json.hpp"
 
 #include <iostream>
 #include <fstream>
