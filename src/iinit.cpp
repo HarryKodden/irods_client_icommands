@@ -414,8 +414,9 @@ int main( int argc, char **argv )
         irods::error ret = irods::get_json_environment_file( env_file, session_file );
         if ( ret.ok() ) {
             json obj_to_dump;
-
-            if (std::ifstream in{env_file}; in) {
+            std::ifstream in{env_file};
+            
+            if (in) {
                 try {
                     in >> obj_to_dump;
                 }
